@@ -6,7 +6,18 @@
       "Bash(git init:*)",
       "Bash(git config:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(where:*)",
+      "Bash(gh auth:*)",
+      "Bash(python3:*)",
+      "Bash(gh label create:*)",
+      "Bash(gh project create:*)",
+      "Bash(gh project list:*)",
+      "Bash(gh issue list:*)",
+      "Bash(timeout 120 python3:*)"
     ]
   }
 }
