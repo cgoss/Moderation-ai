@@ -15,7 +15,7 @@ instagrapi==2.0.0
 # NLP and Analysis
 nltk==3.8.1
 textblob==0.17.1
-scikit-learn==1.3.2
+scikit-learn==1.5.0
 numpy==1.24.3
 pandas==2.0.3
 
