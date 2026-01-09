@@ -1,8 +1,13 @@
 """Integration tests for Twitter, Reddit, and YouTube platforms."""
 
+import os
+import sys
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+
+# Add src to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from src.core.base import Comment, Post, ModerationAction
 

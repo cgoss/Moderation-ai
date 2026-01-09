@@ -1,9 +1,14 @@
 """API Client Tests for All Platforms"""
 
+import os
+import sys
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime, timedelta
 import json
+
+# Add src to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from tests.fixtures import (
     MockInstagramAPI,

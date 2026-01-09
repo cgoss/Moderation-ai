@@ -1,9 +1,13 @@
 """Rate Limiting Tests for All Platforms"""
 
+import os
+import sys
 import pytest
 from unittest.mock import Mock, patch, MagicMock
-import time
-from datetime import datetime
+from datetime import datetime, timedelta
+
+# Add src to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from tests.fixtures import (
     mock_rate_limiter,
