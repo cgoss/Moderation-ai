@@ -1,0 +1,193 @@
+name: CD - Deploy to Production
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy'
+        required: true
+        default: 'latest'
+        type: string
+      confirm:
+        description: 'Type "PRODUCTION" to confirm deployment'
+        required: true
+        default: ''
+
+jobs:
+  pre-checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Confirm production deployment
+      run: |
+        if [ "${{ github.event.inputs.confirm }}" != "PRODUCTION" ]; then
+          echo "ERROR: Must confirm by typing 'PRODUCTION'"
+          exit 1
+        fi
+    
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Check for unmerged changes
+      run: |
+        # Ensure all changes are merged to main before production deploy
+        if ! git branch --contains HEAD | grep -q 'main'; then
+          echo "ERROR: Deployed branch must be merged to main"
+          exit 1
+        fi
+    
+    - name: Run final tests
+      run: |
+        python -m pip install -r requirements.txt
+        pytest tests/ -v --tb=short
+
+  deploy-production:
+    if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.confirm == 'PRODUCTION'
+    runs-on: ubuntu-latest
+    environment: production
+    needs: pre-checks
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: moderation-bot/moderation-bot
+        tags: |
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Deploy to production
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USER }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        script: |
+          # Create backup
+          cd /app/moderation-bot
+          docker-compose exec web python -c "import shutil; shutil.copytree('data', 'data.backup', dirs_exist_ok=True)" || true
+          
+          # Pull new image
+          docker-compose pull
+          
+          # Zero-downtime deployment
+          docker-compose up -d --no-deps web
+          docker-compose up -d --scale web=2
+          
+          # Health check
+          sleep 60
+          docker-compose exec web curl -f http://localhost:8000/health || exit 1
+          
+          # Complete deployment
+          docker-compose up -d --scale web=1
+          docker image prune -f
+    
+    - name: Health check
+      run: |
+        sleep 30
+        curl -f ${{ secrets.PRODUCTION_URL }}/health || exit 1
+    
+    - name: Notify deployment success
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: 'Production deployment successful! Version: ${{ github.event.inputs.version }}'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+    
+    - name: Notify deployment failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: 'Production deployment failed! Version: ${{ github.event.inputs.version }}'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+    
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Automated production deployment
+          
+          ## Changes
+          - See commit history for details
+        draft: false
+        prerelease: false
+
+  rollback-production:
+    if: failure() && github.event.inputs.confirm == 'PRODUCTION'
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    
+    steps:
+    - name: Rollback production
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.PRODUCTION_HOST }}
+        username: ${{ secrets.PRODUCTION_USER }}
+        key: ${{ secrets.PRODUCTION_SSH_KEY }}
+        script: |
+          cd /app/moderation-bot
+          
+          # Restore from backup
+          if [ -d "data.backup" ]; then
+            docker-compose down
+            rm -rf data
+            mv data.backup data
+            docker-compose up -d
+          else
+            # Fallback: redeploy previous version
+            docker-compose down
+            git fetch --tags
+            PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
+            git checkout $PREV_TAG
+            docker-compose pull
+            docker-compose up -d
+          fi
+    
+    - name: Health check after rollback
+      run: |
+        sleep 30
+        curl -f ${{ secrets.PRODUCTION_URL }}/health || exit 1
+    
+    - name: Notify rollback
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: 'Production rolled back successfully!'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}

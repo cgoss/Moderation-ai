@@ -1,0 +1,186 @@
+{
+  "dashboard": {
+    "title": "Moderation Bot Performance",
+    "tags": ["performance"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "panels": [
+      {
+        "title": "Request Throughput",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[5m]) * 60",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "yAxes": [
+          {"label": "Requests/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "Response Time (P95)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, http_request_duration_seconds)",
+            "legendFormat": "P95"
+          }
+        ],
+        "yAxes": [
+          {"label": "Seconds", "format": "s"}
+        ]
+      },
+      {
+        "title": "Error Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[5m]) * 100",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "yAxes": [
+          {"label": "Error Rate %", "format": "percent"}
+        ]
+      },
+      {
+        "title": "CPU Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{container=\"web\"}[5m]) * 100",
+            "legendFormat": "Web"
+          },
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{container=\"postgres\"}[5m]) * 100",
+            "legendFormat": "PostgreSQL"
+          },
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{container=\"redis\"}[5m]) * 100",
+            "legendFormat": "Redis"
+          }
+        ],
+        "yAxes": [
+          {"label": "CPU %", "format": "percent"}
+        ]
+      },
+      {
+        "title": "Memory Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "container_memory_usage_bytes{container=\"web\"} / 1024 / 1024",
+            "legendFormat": "Web"
+          },
+          {
+            "expr": "container_memory_usage_bytes{container=\"postgres\"} / 1024 / 1024",
+            "legendFormat": "PostgreSQL"
+          },
+          {
+            "expr": "container_memory_usage_bytes{container=\"redis\"} / 1024 / 1024",
+            "legendFormat": "Redis"
+          }
+        ],
+        "yAxes": [
+          {"label": "Memory MB", "format": "decmbytes"}
+        ]
+      },
+      {
+        "title": "Active Moderation Queue",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "redis_queue_length",
+            "legendFormat": "Queue Length"
+          }
+        ],
+        "yAxes": [
+          {"label": "Items", "format": "short"}
+        ]
+      },
+      {
+        "title": "Platform API Calls",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "rate(platform_api_calls_total{platform=\"instagram\"}[5m]) * 60",
+            "legendFormat": "Instagram"
+          },
+          {
+            "expr": "rate(platform_api_calls_total{platform=\"medium\"}[5m]) * 60",
+            "legendFormat": "Medium"
+          },
+          {
+            "expr": "rate(platform_api_calls_total{platform=\"tiktok\"}[5m]) * 60",
+            "legendFormat": "TikTok"
+          }
+        ],
+        "yAxes": [
+          {"label": "Calls/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "Database Query Time",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, pg_stat_statements_mean_time)",
+            "legendFormat": "P95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, pg_stat_statements_mean_time)",
+            "legendFormat": "P99"
+          }
+        ],
+        "yAxes": [
+          {"label": "Seconds", "format": "s"}
+        ]
+      },
+      {
+        "title": "Redis Cache Hit Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
+        "targets": [
+          {
+            "expr": "rate(redis_keyspace_hits_total[5m]) / (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m])) * 100",
+            "legendFormat": "Hit Rate %"
+          }
+        ],
+        "yAxes": [
+          {"label": "Hit Rate %", "format": "percent"}
+        ]
+      },
+      {
+        "title": "Moderation Actions",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 12, "y": 32},
+        "targets": [
+          {
+            "expr": "rate(moderation_actions_total{action=\"delete\"}[5m]) * 60",
+            "legendFormat": "Delete"
+          },
+          {
+            "expr": "rate(moderation_actions_total{action=\"hide\"}[5m]) * 60",
+            "legendFormat": "Hide"
+          },
+          {
+            "expr": "rate(moderation_actions_total{action=\"allow\"}[5m]) * 60",
+            "legendFormat": "Allow"
+          }
+        ],
+        "yAxes": [
+          {"label": "Actions/min", "format": "short"}
+        ]
+      }
+    ]
+  }
+}

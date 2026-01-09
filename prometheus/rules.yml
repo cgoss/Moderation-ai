@@ -1,0 +1,123 @@
+groups:
+  - name: alert.rules
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          (
+            rate(http_requests_total{status=~"5.."}[5m]) / 
+            rate(http_requests_total[5m])
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: moderation-bot
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+
+      - alert: HighResponseTime
+        expr: |
+          histogram_quantile(0.95, http_request_duration_seconds) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: moderation-bot
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is {{ $value }}s"
+
+      - alert: DatabaseConnectionFailed
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: database
+        annotations:
+          summary: "Database connection failed"
+          description: "PostgreSQL database is not responding"
+
+      - alert: RedisConnectionFailed
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: cache
+        annotations:
+          summary: "Redis connection failed"
+          description: "Redis cache is not responding"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            container_memory_usage_bytes{container="web"} / 
+            container_spec_memory_limit_bytes{container="web"}
+          ) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: moderation-bot
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: HighCPUUsage
+        expr: |
+          (
+            rate(container_cpu_usage_seconds_total{container="web"}[5m]) * 
+            100
+          ) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: moderation-bot
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: DiskSpaceLow
+        expr: |
+          (
+            node_filesystem_avail_bytes{mountpoint="/app/data"} / 
+            node_filesystem_size_bytes{mountpoint="/app/data"}
+          ) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: storage
+        annotations:
+          summary: "Low disk space detected"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"
+
+      - alert: ModerationQueueFull
+        expr: redis_queue_length > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: queue
+        annotations:
+          summary: "Moderation queue is full"
+          description: "Queue length is {{ $value }} items"
+
+      - alert: APICallFailure
+        expr: |
+          (
+            rate(platform_api_calls_failed_total[5m]) / 
+            rate(platform_api_calls_total[5m])
+          ) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          service: platform-integration
+        annotations:
+          summary: "High platform API failure rate"
+          description: "API failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: ServiceDown
+        expr: up{job="moderation-bot"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: moderation-bot
+        annotations:
+          summary: "Moderation Bot service is down"
+          description: "Service has been down for more than 1 minute"

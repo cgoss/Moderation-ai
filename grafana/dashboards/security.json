@@ -1,0 +1,127 @@
+{
+  "dashboard": {
+    "title": "Moderation Bot Security",
+    "tags": ["security"],
+    "timezone": "browser",
+    "refresh": "60s",
+    "panels": [
+      {
+        "title": "Failed Authentication Attempts",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(auth_failures_total[5m]) * 60",
+            "legendFormat": "Failures/min"
+          }
+        ],
+        "yAxes": [
+          {"label": "Failures/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "Rate Limit Violations",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(rate_limit_violations_total[5m]) * 60",
+            "legendFormat": "Violations/min"
+          }
+        ],
+        "yAxes": [
+          {"label": "Violations/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "Suspicious Activity",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(suspicious_requests_total[5m]) * 60",
+            "legendFormat": "Suspicious/min"
+          }
+        ],
+        "yAxes": [
+          {"label": "Suspicious/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "Blocked IPs",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "blocked_ip_count",
+            "legendFormat": "Total Blocked IPs"
+          }
+        ]
+      },
+      {
+        "title": "Webhook Failures",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(webhook_failures_total[5m]) * 60",
+            "legendFormat": "Failures/min"
+          }
+        ],
+        "yAxes": [
+          {"label": "Failures/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "API Key Errors",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "rate(api_key_errors_total[5m]) * 60",
+            "legendFormat": "Errors/min"
+          }
+        ],
+        "yAxes": [
+          {"label": "Errors/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "Input Validation Errors",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "rate(input_validation_errors_total[5m]) * 60",
+            "legendFormat": "Errors/min"
+          }
+        ],
+        "yAxes": [
+          {"label": "Errors/min", "format": "short"}
+        ]
+      },
+      {
+        "title": "SQL Injection Attempts",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "sql_injection_attempts_total",
+            "legendFormat": "Total Attempts"
+          }
+        ]
+      },
+      {
+        "title": "XSS Attempts",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 16},
+        "targets": [
+          {
+            "expr": "xss_attempts_total",
+            "legendFormat": "Total Attempts"
+          }
+        ]
+      }
+    ]
+  }
+}
