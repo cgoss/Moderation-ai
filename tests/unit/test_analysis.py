@@ -1,7 +1,12 @@
 """Unit tests for analysis modules."""
 
+import os
+import sys
 import pytest
 from datetime import datetime
+
+# Add src to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src"))
 
 from src.core.base import Comment, Sentiment, Severity
 from src.analysis.sentiment import SentimentAnalyzer

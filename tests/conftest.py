@@ -2,6 +2,7 @@
 # conftest.py - Test configuration and fixtures
 
 import os
+import sys
 import pytest
 import asyncio
 import tempfile
@@ -9,6 +10,12 @@ from typing import Generator, Dict, Any
 from unittest.mock import Mock, AsyncMock
 from datetime import datetime, timedelta
 import json
+
+# Add src to Python path for imports
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+src_path = os.path.join(project_root, "src")
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
 
 # Environment configuration
 TEST_ENV = os.getenv("TEST_ENV", "local")

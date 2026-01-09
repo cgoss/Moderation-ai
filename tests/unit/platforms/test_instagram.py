@@ -1,8 +1,13 @@
 """Unit Tests for Instagram Adapter"""
 
+import os
+import sys
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 import json
+
+# Add src to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 
 from tests.fixtures import (
     MockInstagramAPI,
@@ -19,7 +24,7 @@ class TestInstagramAPIClient:
 
     def test_client_initialization(self, instagram_config):
         """Test Instagram client initialization"""
-        from src.platforms.instagram.client import InstagramAPIClient
+        from src.platforms.instagram import InstagramPlatform
 
         client = InstagramAPIClient(instagram_config)
 
