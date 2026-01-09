@@ -10,6 +10,11 @@ from .api_mocks import (
     MockTikTokAPI,
     create_mock_session,
 )
+
+# Mock APIs for additional platforms
+MockTwitterAPI = Mock
+MockRedditAPI = Mock
+MockYouTubeAPI = Mock
 from .auth_fixtures import (
     valid_auth_token,
     auth_headers,
@@ -434,3 +439,65 @@ def mock_batch_operation():
     operation.process.return_value = {"successful": 10, "failed": 0, "total": 10}
     operation.get_progress.return_value = 100
     return operation
+
+
+@pytest.fixture
+def twitter_config() -> Dict[str, Any]:
+    """Twitter/X configuration fixture"""
+    return {
+        "api_key": "test_twitter_api_key",
+        "api_secret": "test_twitter_api_secret",
+        "bearer_token": "test_twitter_bearer_token",
+        "access_token": "test_twitter_access_token",
+        "access_token_secret": "test_twitter_access_token_secret",
+        "api_base_url": "https://api.twitter.com/2",
+    }
+
+
+@pytest.fixture
+def reddit_config() -> Dict[str, Any]:
+    """Reddit configuration fixture"""
+    return {
+        "client_id": "test_reddit_client_id",
+        "client_secret": "test_reddit_client_secret",
+        "user_agent": "test_moderation_bot/1.0",
+        "redirect_uri": "http://localhost:8080/callback",
+        "access_token": "test_reddit_token",
+        "api_base_url": "https://oauth.reddit.com",
+    }
+
+
+@pytest.fixture
+def youtube_config() -> Dict[str, Any]:
+    """YouTube configuration fixture"""
+    return {
+        "api_key": "test_youtube_api_key",
+        "client_id": "test_youtube_client_id",
+        "client_secret": "test_youtube_client_secret",
+        "access_token": "test_youtube_access_token",
+        "api_base_url": "https://www.googleapis.com/youtube/v3",
+    }
+
+
+@pytest.fixture
+def twitter_client(twitter_config: Dict[str, Any]) -> MockTwitterAPI:
+    """Twitter client fixture"""
+    client = MockTwitterAPI()
+    client.config = twitter_config
+    return client
+
+
+@pytest.fixture
+def reddit_client(reddit_config: Dict[str, Any]) -> MockRedditAPI:
+    """Reddit client fixture"""
+    client = MockRedditAPI()
+    client.config = reddit_config
+    return client
+
+
+@pytest.fixture
+def youtube_client(youtube_config: Dict[str, Any]) -> MockYouTubeAPI:
+    """YouTube client fixture"""
+    client = MockYouTubeAPI()
+    client.config = youtube_config
+    return client

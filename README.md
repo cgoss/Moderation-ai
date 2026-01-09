@@ -2,7 +2,7 @@
 
 ## Overview
 
-AI-powered content moderation system for Instagram, Medium, and TikTok with production-ready deployment, comprehensive monitoring, and complete documentation suite.
+AI-powered content moderation system for Twitter/X, Reddit, YouTube, Instagram, Medium, and TikTok with production-ready deployment, comprehensive monitoring, and complete documentation suite.
 
 ## 📊 Project Statistics
 
@@ -12,7 +12,7 @@ AI-powered content moderation system for Instagram, Medium, and TikTok with prod
 | **Total Lines of Code** | 25,000+ | Complete production system |
 | **Test Coverage** | 85%+ | 120+ comprehensive tests |
 | **Documentation Pages** | 40+ | Complete user and developer guides |
-| **Supported Platforms** | 3 | Instagram, Medium, TikTok |
+| **Supported Platforms** | 6 | Twitter/X, Reddit, YouTube, Instagram, Medium, TikTok |
 | **Integration Tests** | 50+ | Cross-platform workflows tested |
 | **Test Fixtures** | 50+ | Reusable test data and mocks |
 | **CI/CD Workflows** | 3 | Automated pipelines |
@@ -21,7 +21,7 @@ AI-powered content moderation system for Instagram, Medium, and TikTok with prod
 
 ## 🚀 Key Features
 
-- **Multi-Platform Support**: Instagram, Medium, TikTok
+- **Multi-Platform Support**: Twitter/X, Reddit, YouTube, Instagram, Medium, TikTok
 - **AI-Powered Moderation**: 95%+ accuracy across all categories
 - **Real-Time Processing**: WebSocket updates via webhooks
 - **Configurable Rules**: Customizable moderation policies
@@ -46,6 +46,7 @@ AI-powered content moderation system for Instagram, Medium, and TikTok with prod
 - Redis (multi-level caching)
 - Prometheus (metrics collection)
 - Grafana (visualization)
+- Platform Integration Services (6 platform adapters)
 
 ## 🛠️ Tech Stack
 
@@ -65,7 +66,7 @@ AI-powered content moderation system for Instagram, Medium, and TikTok with prod
 
 | Type | Count | Files |
 |------|-------|------|
-| **Platform Docs** | 33 | Complete integration guides (11 per platform) |
+| **Platform Docs** | 66 | Complete integration guides (11 per platform for 6 platforms) |
 | **User Guides** | 8 | Quick start, dashboard, manual, best practices |
 | **API Reference** | 1 | Complete API documentation with examples |
 | **Architecture Docs** | 1 | System design overview |

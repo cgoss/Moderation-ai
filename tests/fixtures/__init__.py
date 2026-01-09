@@ -9,6 +9,11 @@ from .api_mocks import (
     create_webhook_event,
 )
 
+# Mock APIs for additional platforms (to be implemented)
+MockTwitterAPI = None
+MockRedditAPI = None
+MockYouTubeAPI = None
+
 from .auth_fixtures import (
     valid_auth_token,
     expired_auth_token,
@@ -55,9 +60,15 @@ from .platform_fixtures import (
     instagram_config,
     medium_config,
     tiktok_config,
+    twitter_config,
+    reddit_config,
+    youtube_config,
     instagram_client,
     medium_client,
     tiktok_client,
+    twitter_client,
+    reddit_client,
+    youtube_client,
     mock_rate_limiter,
     mock_moderation_engine,
     mock_action_executor,
@@ -93,6 +104,9 @@ __all__ = [
     "MockInstagramAPI",
     "MockMediumAPI",
     "MockTikTokAPI",
+    "MockTwitterAPI",
+    "MockRedditAPI",
+    "MockYouTubeAPI",
     "mock_response_factory",
     "create_mock_session",
     "create_webhook_event",
@@ -135,9 +149,15 @@ __all__ = [
     "instagram_config",
     "medium_config",
     "tiktok_config",
+    "twitter_config",
+    "reddit_config",
+    "youtube_config",
     "instagram_client",
     "medium_client",
     "tiktok_client",
+    "twitter_client",
+    "reddit_client",
+    "youtube_client",
     "mock_rate_limiter",
     "mock_moderation_engine",
     "mock_action_executor",
