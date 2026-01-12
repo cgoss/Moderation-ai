@@ -4,7 +4,7 @@ pydantic==2.5.0
 pydantic-settings==2.1.0
 
 # API Integration
-requests==2.31.0
+requests==2.32.4
 tweepy==4.14.0
 praw==7.7.0
 google-api-python-client==2.108.0
